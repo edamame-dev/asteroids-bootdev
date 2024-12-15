@@ -9,9 +9,19 @@ from shot import Shot
 
 def main():
     pygame.init
+    pygame.font.init()
+
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
     black = (0, 0, 0)
+    white = (255, 255, 255)
+    score = 0
+    lives = 5
+    is_alive = True
+
     clock = pygame.time.Clock()
+
+    font = pygame.font.Font(None, 36)
 
     player_x = SCREEN_WIDTH / 2
     player_y = SCREEN_HEIGHT / 2
@@ -42,17 +52,30 @@ def main():
             sprites.update(dt)
 
         for asteroid in asteroids:
-            if asteroid.check_collision(player) == True:
-                print("Game over!")
-                sys.exit()
+            if asteroid.check_collision(player) == True and is_alive == True:
+                    lives -= 1
+                    player.kill()
 
         for asteroid in asteroids:
             for shot in shots:
                 if shot.check_collision(asteroid) == True:
+                    score += 50
                     shot.kill()
                     asteroid.split()
 
+        if not player.is_alive and lives > 0:
+            player.respawn()
+
+        if lives < 1:
+            sys.exit()
+
         screen.fill(black)
+
+        score_text = font.render(f"Score: {score}", True, white)
+        lives_text = font.render(f"Lives: {lives}", True, white)
+
+        screen.blit(score_text, (10, 10))
+        screen.blit(lives_text, (SCREEN_WIDTH - 100, 10))
 
         for sprites in drawable:
             sprites.draw(screen)
