@@ -1,26 +1,20 @@
 import pygame
+from triangleshape import TriangleShape
 from circleshape import CircleShape
 from constants import *
 from shot import Shot
 
-class Player(CircleShape):
-    def __init__(self, x, y):
-        super().__init__(x, y, PLAYER_RADIUS)
+class Player(TriangleShape):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, PLAYER_SIZE)
+        self.position = pygame.Vector2(x, y)
         self.rotation = 0
         self.shot_timer = 0
         self.is_alive = True
 
-    # in the player class
-    def triangle(self):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
-        a = self.position + forward * self.radius
-        b = self.position - forward * self.radius - right
-        c = self.position - forward * self.radius + right
-        return [a, b, c]
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, "White", self.triangle(), 2)
+        pygame.draw.polygon(screen, "White", self.calculate_vertices(), 2)
 
     def rotate(self, dt):
         self.rotation += PLAYER_TURN_SPEED * dt
@@ -52,7 +46,7 @@ class Player(CircleShape):
         shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
 
     def initial_position(self):
-        return (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        return pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
     def respawn(self):
         self.position = self.initial_position()

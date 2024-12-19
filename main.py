@@ -36,7 +36,7 @@ def main():
     AsteroidField.containers = updateable
     Shot.containers = (shots, updateable, drawable)
 
-    player = Player(player_x, player_y)
+    player = Player(player_x, player_y, PLAYER_SIZE)
 
     asteroid_field = AsteroidField()
 
@@ -52,15 +52,18 @@ def main():
             sprites.update(dt)
 
         for asteroid in asteroids:
-            if asteroid.check_collision(player) == True and is_alive == True:
+            if player.check_collision(asteroid) == True and is_alive == True:
                     lives -= 1
                     player.kill()
+                    clear_asteroids(asteroids)
+                    break
 
         for asteroid in asteroids:
             for shot in shots:
                 if shot.check_collision(asteroid) == True:
                     score += 50
                     shot.kill()
+                    asteroid.kill()
                     asteroid.split()
 
         if not player.is_alive and lives > 0:
@@ -84,6 +87,9 @@ def main():
 
         dt = clock.tick(60) / 1000
 
+        def clear_asteroids(asteroids):
+            for asteroid in list(asteroids):
+                asteroid.kill()
 
 if __name__ == "__main__":
     main()
